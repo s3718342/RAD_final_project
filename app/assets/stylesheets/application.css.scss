@@ -16,3 +16,14 @@
  
  
 @import "bootstrap";
+
+body{
+    font-family: 'Courier New', monospace;
+    
+    background-color: #121212;
+    color: lime;
+}
+
+.elevated{
+    background-color: rgba(255,255,255,0.07)
+}
