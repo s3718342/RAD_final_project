@@ -27,4 +27,14 @@ $(document).ready(function() {
 
     $valueSpan.html($value.val());
   });
+  
+  
+  $('.next').click(function(){
+     $(this).parent().parent().hide().next().show();//hide parent and show next
+  });
+  
+  $('.back').click(function(){
+     $(this).parent().parent().hide().prev().show();//hide parent and show previous
+  });
 });
+

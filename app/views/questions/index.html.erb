@@ -1,21 +1,35 @@
 <div class="elevated my-5 p-3">
 <%= form_with url: "/submit", method: :post do |form| %>
-  <%@questions.each do |question|%>
-    <div class="mb-4 border-bottom border-light">
-    <h5><%= question.question%></h5><br/>
-    
-    <%question.answers.each do |answer|%>
-      <label class="category-select">
-        <%= form.check_box "answers[#{question.id}]", {multiple: true}, answer.id, nil %>
-        <%=answer.description%>
-      </label></br>
+  <%@questions.each_with_index do |question, index|%>
+    <%if index == 0%>
+    <div class="mb-4">
+    <%else%>
+    <div class="mb-4" style="display:none;">
     <%end%>
-
+      <h5><%= question.question%></h5><br/>
+      
+      <%question.answers.each do |answer|%>
+        <label class="category-select">
+          <%= form.check_box "answers[#{question.id}]", {multiple: true}, answer.id, nil %>
+          <%=answer.description%>
+        </label></br>
+      <%end%>
+      <!--Previous and next buttons from http://jsfiddle.net/yxpc9qr9/-->
+      <div class="d-flex flex-row-reverse w-100 justify-content-between">
+        <%if index == @questions.size - 1%>
+          <%= form.submit "Submit", class:"btn-outline-light" %>
+        <%else%>
+          <button type="button" class="next btn-outline-info">Next</button>
+          
+        <%end%>
+        <%if index > 0%>
+          <button type="button"  class="back btn-outline-info">back</button>
+        <%end%>
+        
+      </div>
     </div>
   <%end%>
   
   <%= hidden_field_tag "questions", value: @questions.ids %>
-  
-  <%= form.submit "Submit", class:"w-100 btn-outline-light" %>
-<%end%>
+  <%end%>
 </div>
