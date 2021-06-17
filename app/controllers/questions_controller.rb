@@ -17,7 +17,12 @@ class QuestionsController < ApplicationController
       num_questions = 8
     end
     
-    categories = params[:categories]
+    difficulty = 'easy'
+    if params[:num_questions]
+      difficulty = params[:difficulty]
+    end
+  
+    categories = params[:categories]  
     
     distribution = {}
     # Get the distribution of questions 
@@ -36,13 +41,12 @@ class QuestionsController < ApplicationController
         num = (prop/total * num_questions.to_f).round
       end
       remaning -= num
-      puts "http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}"
       # Gets questions from the api using env variable api key
-      URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}") do |json|
+      URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}&difficulty=#{difficulty}") do |json|
         data = JSON.parse(json.read)
         # If there was no response, get random questions from db
         if not data or data.empty?
-          ids << Question.where(category: category).order(Arel.sql("RANDOM()")).limit(num).ids
+          ids << Question.where(category: category, difficulty: difficulty).order(Arel.sql("RANDOM()")).limit(num).ids
         else
           
           # Iterate over the questions
