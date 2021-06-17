@@ -85,16 +85,15 @@ class QuestionsController < ApplicationController
       score = q_ids.size
       
       #TODO: multiple correct answers support 
-      @answers.each do |_, answers|
-        answers.each do |answer|
-          if not answer.correct
-            score -= 1
-            break
-          end
+      @answers.each do |question, answers|
+        
+        actual = @questions.find(question).answers.where(correct: true).ids
+        # symmetric difference between actual and submitted answers
+        if not (actual - answers | answers - actual).empty?
+          score -= 1
         end
+        
       end
-      
-      puts score
       
       if cookies[:history].blank? or cookies[:history].size == 0
         cookies[:history] = JSON.generate([helpers.generateHistory(score, @questions.size)])
@@ -123,7 +122,7 @@ class QuestionsController < ApplicationController
   end
   
   def getAnswersFromParams
-    @answers = Hash[params[:answers].keys.map(&:to_i).zip(params[:answers].values.map{|row| row.map{|i| Answer.find(i.to_i)}})]
+    @answers = Hash[params[:answers].keys.map(&:to_i).zip(params[:answers].values.map{|row| row.map{|i| i.to_i}})]
   end
   
   def getQuestionsFromParams
