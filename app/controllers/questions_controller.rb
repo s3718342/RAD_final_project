@@ -10,7 +10,11 @@ class QuestionsController < ApplicationController
   def index
     num_questions = 4
     if params[:num_questions]
-      num_questions = params[:num_questions]
+      num_questions = params[:num_questions].to_i
+    end
+    
+    if num_questions < 4 or num_questions > 8
+      num_questions = 8
     end
     
     categories = params[:categories]
@@ -23,7 +27,7 @@ class QuestionsController < ApplicationController
     
     total = distribution.values.inject(0, :+)
     
-    remaning = num_questions.to_i
+    remaning = num_questions
     ids = []
     distribution.each_with_index do |(category, prop), index|
       if index == distribution.size() - 1
@@ -64,6 +68,9 @@ class QuestionsController < ApplicationController
         end
       end
     end
+    cookies[:num_questions] = num_questions
+    cookies[:categories] = categories.to_json
+    
     @questions = Question.where(id: ids)
   end
   
