@@ -1,3 +1,15 @@
 <div class="elevated my-5 p-3">
-  <%=params[:score]%>
+
+  <h3 class="text-center"><%="You answered #{@score} out of #{@questions.size} questions correctly"%></h3>
+  
+  <!--TODO: Add timezone support-->
+  <div class="mt-4">
+    <%@history.each_with_index do |h, index|%>
+      <% index > 4 && break%>
+      <%= DateTime.iso8601(h["time"]).strftime("At %I:%M%p, %m/%d/%Y, you answered #{h["score"]}/#{h["num_questions"]} questions correctly")%>
+      <br/>
+    <%end%>
+  </div>
+  
+  <%= button_to "Reload", url_options={controller: "questions", action: "index"},  method: :get, class: "mt-5 btn-outline-light w-100"%>
 </div>

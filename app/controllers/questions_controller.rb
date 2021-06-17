@@ -1,9 +1,15 @@
 class QuestionsController < ApplicationController
   
-  before_action :getAnswersFromParams, :getQuestionsFromParams, only: [:submit]
-  
+  before_action :checkValidity, only: [:submit, :result]
+  before_action :getAnswersFromParams, only: [:submit]
+  before_action :getQuestionsFromParams, only: [:submit, :result, :index]
   def index
-    @questions = Question.order("RANDOM()").limit(1)
+    puts "print"
+    puts params[:questions]
+    
+    if not @questions
+      @questions = Question.order(Arel.sql("RANDOM()")).limit(2)
+    end
   end
   
   def submit
@@ -24,7 +30,16 @@ class QuestionsController < ApplicationController
       
       puts score
       
-      redirect_to action: "result", score: score
+      if cookies[:history].blank? or cookies[:history].size == 0
+        cookies[:history] = JSON.generate([helpers.generateHistory(score, @questions.size)])
+      else
+        history = JSON.parse(cookies[:history])
+        history << helpers.generateHistory(score, @questions.size)
+        cookies[:history] = history.to_json
+      end
+      redirect_to action: "result", score: score, questions: params[:questions]
+      
+      print cookies[:history]
       
     else
       #TODO: make flash or something when not all answers are filled in
@@ -33,6 +48,7 @@ class QuestionsController < ApplicationController
   end
   
   def result
+    @history = JSON.parse(cookies[:history])
     @score = params[:score]
   end
   
@@ -41,12 +57,16 @@ class QuestionsController < ApplicationController
   end
   
   def getQuestionsFromParams
-    ids = eval(params[:questions])[:value]
-    @questions = Question.where(id: ids)
+    if params[:questions]
+      ids = eval(params[:questions])[:value]
+      @questions = Question.where(id: ids)
+    end
   end
   
-  def validateAnswers
-    
+  def checkValidity
+    if not params[:questions] 
+      redirect_to root_path
+    end
   end
   
   

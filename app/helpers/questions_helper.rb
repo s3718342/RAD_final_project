@@ -1,15 +1,7 @@
 module QuestionsHelper
   
-  def questionOptions(question)
-    options = []
-    
-    answers = question.answers
-    
-    answers.each do |answer| 
-      options.push([answer.description, answer.id])
-    end
-    
-    return options
+  def generateHistory(score, size)
+    {time: DateTime.current.to_s, score: score, num_questions: size}
   end
   
 end
