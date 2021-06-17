@@ -11,9 +11,7 @@ class QuestionsController < ApplicationController
     
     puts params
     
-    if params[:questions]
-      
-    else
+    if not params[:questions]
     
       num_questions = 4
       if params[:num_questions]
@@ -39,42 +37,55 @@ class QuestionsController < ApplicationController
       
       total = distribution.values.inject(0, :+)
       
-      remaning = num_questions
+      remaining = num_questions
       ids = []
       distribution.each_with_index do |(category, prop), index|
         if index == distribution.size() - 1
-          num = remaning
+          num = remaining
         else
           num = (prop/total * num_questions.to_f).round
         end
-        remaning -= num
-        # Gets questions from the api using env variable api key
-        URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}&difficulty=#{difficulty}") do |json|
-          data = JSON.parse(json.read)
-          # If there was no response, get random questions from db
-          if not data or data.empty?
-            ids << Question.where(category: category, difficulty: difficulty).order(Arel.sql("RANDOM()")).limit(num).ids
-          else
-            
-            # Iterate over the questions
-            data.each do |question|
-              id = question["id"].to_i
-              # Create a new question record if it does not exist in the db
-              if not Question.exists?(id: id)
-                q = Question.create!(
-                  id: question["id"], 
-                  question: question["question"], 
-                  explanation: question["explanation"], 
-                  category: question["category"], 
-                  difficulty: question["difficulty"]
-                )
-                question["answers"].each do |key, value|
-                  if(value)
-                    q.answers.create!(description: value, correct: helpers.true?(question["correct_answers"]["#{key}_correct"]))
+        
+        puts "i"
+        puts "i"
+        puts "i"
+        puts "i"
+        puts "i"
+        puts "i"
+        puts "i"
+        print ids.length
+        
+        remaining -= num
+        
+        if num > 0
+          # Gets questions from the api using env variable api key
+          URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}&difficulty=#{difficulty}") do |json|
+            data = JSON.parse(json.read)
+            # If there was no response, get random questions from db
+            if not data or data.empty?
+              ids << Question.where(category: category, difficulty: difficulty).order(Arel.sql("RANDOM()")).limit(num).ids
+            else
+              
+              # Iterate over the questions
+              data.each do |question|
+                id = question["id"].to_i
+                # Create a new question record if it does not exist in the db
+                if not Question.exists?(id: id)
+                  q = Question.create!(
+                    id: question["id"], 
+                    question: question["question"], 
+                    explanation: question["explanation"], 
+                    category: question["category"], 
+                    difficulty: question["difficulty"]
+                  )
+                  question["answers"].each do |key, value|
+                    if(value)
+                      q.answers.create!(description: value, correct: helpers.true?(question["correct_answers"]["#{key}_correct"]))
+                    end
                   end
                 end
+                ids << id
               end
-              ids << id
             end
           end
         end
@@ -85,6 +96,7 @@ class QuestionsController < ApplicationController
 
       @questions = Question.where(id: ids)
     end
+    
   end
   
   def submit
