@@ -17,13 +17,13 @@
       <!--Previous and next buttons from http://jsfiddle.net/yxpc9qr9/-->
       <div class="d-flex flex-row-reverse w-100 justify-content-between">
         <%if index == @questions.size - 1%>
-          <%= form.submit "Submit", class:"btn-outline-light" %>
+          <%= form.submit "submit", class:"btn btn-outline-light" %>
         <%else%>
-          <button type="button" class="next btn-outline-info">Next</button>
+          <button type="button" class="next btn btn-outline-info">next</button>
           
         <%end%>
         <%if index > 0%>
-          <button type="button"  class="back btn-outline-info">back</button>
+          <button type="button"  class="back btn btn-outline-info">back</button>
         <%end%>
         
       </div>
