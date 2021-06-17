@@ -1,0 +1,15 @@
+<div class="elevated my-5 p-4">
+  <%@history.each do |record|%>
+    <div class="mb-3 border-bottom border-dark">
+      <strong>Date/Time: </strong><%=record.time.strftime("%I:%M%p, %m/%d/%Y")%><br/>
+      <strong>Topic: </strong><%=record.topic%><br/>
+      <strong>Difficulty: </strong> <%=record.difficulty%><br/>
+      <strong>Questions: </strong> <%=record.questions%><br/>
+      <strong>Result: </strong> <%=record.result%><br/>
+
+    </div>
+  <%end%>
+  
+  <%= button_to "Go back home", url_options={controller: "pages", action: "home"},  method: :get, class: "mt-5 w-100 btn-outline-light"%>
+
+</div>

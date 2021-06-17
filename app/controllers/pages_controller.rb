@@ -4,8 +4,6 @@ class PagesController < ApplicationController
     
     @categories = []
     if not (cookies[:categories].blank? or cookies[:categories].size == 0)
-      
-      
       @categories = JSON.parse(cookies[:categories])
     end
     if not (cookies[:num_questions].blank?)
@@ -14,5 +12,12 @@ class PagesController < ApplicationController
         @num_questions = 6
       end
     end
+    if not (cookies[:difficulty].blank?)
+      @difficulty = cookies[:difficulty]
+    end
+  end
+  
+  def history
+    @history = Record.order('time desc')
   end
 end

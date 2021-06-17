@@ -16,15 +16,15 @@
       <strong>Diffuclty</strong>
       <div class="w-25">
         <label>
-          <%=radio_button_tag 'difficulty', 'Easy', true%>
+          <%=radio_button_tag 'difficulty', 'Easy', (@difficulty=='Easy' or @difficulty.nil?)%>
           Easy
         </label></br>
         <label>
-          <%=radio_button_tag 'difficulty', 'Medium'%>
+          <%=radio_button_tag 'difficulty', 'Medium', (@difficulty=='Medium')%>
           Medium
         </label></br>
         <label>
-          <%=radio_button_tag 'difficulty', 'Hard'%>
+          <%=radio_button_tag 'difficulty', 'Hard', (@difficulty=='Hard')%>
           Hard
         </label></br>
       </div>
@@ -43,5 +43,9 @@
     <%= submit_tag "Start quiz", id: "start-btn", class:"w-100 btn-outline-light" %>
   <%end%>
   
+  <div class="d-flex justify-content-center">
+    <%= button_to "View quiz history", url_options={controller: "pages", action: "history"},  method: :get, class: "mt-5 btn-outline-info"%>
+  </div>
+
   
 </div>

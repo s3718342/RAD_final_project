@@ -25,7 +25,7 @@ class QuestionsController < ApplicationController
       end
       
       difficulty = 'easy'
-      if params[:num_questions]
+      if params[:difficulty]
         difficulty = params[:difficulty]
       end
     
@@ -81,6 +81,7 @@ class QuestionsController < ApplicationController
       end
       cookies[:num_questions] = num_questions
       cookies[:categories] = categories.to_json
+      cookies[:difficulty] = difficulty
 
       @questions = Question.where(id: ids)
     end
@@ -92,7 +93,6 @@ class QuestionsController < ApplicationController
     if a_ids.size == q_ids.size and q_ids & a_ids == q_ids
       score = q_ids.size
       
-      #TODO: multiple correct answers support 
       @answers.each do |question, answers|
         
         actual = @questions.find(question).answers.where(correct: true).ids
@@ -103,6 +103,15 @@ class QuestionsController < ApplicationController
         
       end
       
+      # Create a history record
+      Record.create!(
+        time: DateTime.current,
+        topic: JSON.parse(cookies[:categories]).join(", "), 
+        difficulty: cookies[:difficulty],
+        questions: @questions.ids.join(", "),
+        result: "#{score}/#{@questions.size}"
+      )
+      
       if cookies[:history].blank? or cookies[:history].size == 0
         cookies[:history] = JSON.generate([helpers.generateHistory(score, @questions.size)])
       else
@@ -111,8 +120,6 @@ class QuestionsController < ApplicationController
         cookies[:history] = history.to_json
       end
       redirect_to action: "result", score: score, questions: params[:questions]
-      
-      print cookies[:history]
       
     else
       #TODO: make flash or something when not all answers are filled in
