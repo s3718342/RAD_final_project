@@ -4,11 +4,13 @@ class QuestionsController < ApplicationController
   before_action :getAnswersFromParams, only: [:submit]
   before_action :getQuestionsFromParams, only: [:submit, :result, :index]
   def index
-    puts "print"
-    puts params[:questions]
+    num_questions = 4
+    if params[:num_questions]
+      num_questions = params[:num_questions]
+    end
     
     if not @questions
-      @questions = Question.order(Arel.sql("RANDOM()")).limit(2)
+      @questions = Question.order(Arel.sql("RANDOM()")).limit(num_questions)
     end
   end
   
