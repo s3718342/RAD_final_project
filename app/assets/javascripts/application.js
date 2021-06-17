@@ -36,5 +36,15 @@ $(document).ready(function() {
   $('.back').click(function(){
      $(this).parent().parent().hide().prev().show();//hide parent and show previous
   });
+  
+  $('#start-quiz-form').submit(function() {
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
+    // TODO: change this to a flash
+    if (!checkedOne){
+      alert("Select at least one category");
+    }
+    return checkedOne;
+  });
 });
 

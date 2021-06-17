@@ -7,45 +7,64 @@ class QuestionsController < ApplicationController
   before_action :checkValidity, only: [:submit, :result]
   before_action :getAnswersFromParams, only: [:submit]
   before_action :getQuestionsFromParams, only: [:submit, :result, :index]
-  
-  
   def index
     num_questions = 4
     if params[:num_questions]
       num_questions = params[:num_questions]
     end
     
-    # Gets questions from the api using env variable api key
-    URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num_questions}") do |json|
-      data = JSON.parse(json.read)
-      # If there was no response, get random questions from db
-      if not data or data.empty?
-        @questions = Question.order(Arel.sql("RANDOM()")).limit(num_questions)
+    categories = params[:categories]
+    
+    distribution = {}
+    # Get the distribution of questions 
+    categories.each_with_index do |category|
+      distribution[category] = rand()
+    end
+    
+    total = distribution.values.inject(0, :+)
+    
+    remaning = num_questions.to_i
+    ids = []
+    distribution.each_with_index do |(category, prop), index|
+      if index == distribution.size() - 1
+        num = remaning
       else
-        ids = []
-        # Iterate over the questions
-        data.each do |question|
-          id = question["id"].to_i
-          # Create a new question record if it does not exist in the db
-          if not Question.exists?(id: id)
-            q = Question.create!(
-              id: question["id"], 
-              question: question["question"], 
-              explanation: question["explanation"], 
-              category: question["category"], 
-              difficulty: question["difficulty"]
-            )
-            question["answers"].each do |key, value|
-              if(value)
-                q.answers.create!(description: value, correct: helpers.true?(question["correct_answers"]["#{key}_correct"]))
+        num = (prop/total * num_questions.to_f).round
+      end
+      remaning -= num
+      puts "http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}"
+      # Gets questions from the api using env variable api key
+      URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num}&category=#{category}") do |json|
+        data = JSON.parse(json.read)
+        # If there was no response, get random questions from db
+        if not data or data.empty?
+          ids << Question.where(category: category).order(Arel.sql("RANDOM()")).limit(num).ids
+        else
+          
+          # Iterate over the questions
+          data.each do |question|
+            id = question["id"].to_i
+            # Create a new question record if it does not exist in the db
+            if not Question.exists?(id: id)
+              q = Question.create!(
+                id: question["id"], 
+                question: question["question"], 
+                explanation: question["explanation"], 
+                category: question["category"], 
+                difficulty: question["difficulty"]
+              )
+              question["answers"].each do |key, value|
+                if(value)
+                  q.answers.create!(description: value, correct: helpers.true?(question["correct_answers"]["#{key}_correct"]))
+                end
               end
             end
+            ids << id
           end
-          ids << id
         end
-        @questions = Question.where(id: ids)
       end
     end
+    @questions = Question.where(id: ids)
   end
   
   def submit

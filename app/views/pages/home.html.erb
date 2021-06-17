@@ -1,16 +1,39 @@
 <div class="elevated my-5 p-4">
   
-  <%= form_tag url_for(controller: "questions", action: "index"), method: :get do  %>
+  <%= form_tag url_for(controller: "questions", action: "index"), method: :get, id: "start-quiz-form" do  %>
+    <div class="d-flex justify-content-between">
+      <strong>Categories</strong>
+      <div class="w-25">
+        <label>
+          <%= check_box_tag "categories[]", "Linux", nil %>
+          Linux
+        </label></br>
+        <label>
+          <%= check_box_tag "categories[]", "DevOps", nil %>
+          DevOps
+        </label></br>
+        <label>
+          <%= check_box_tag "categories[]", "SQL", nil %>
+          SQL
+        </label></br>
+        <label>
+          <%= check_box_tag "categories[]", "Code", nil %>
+          Code
+        </label></br>
+      </div>
+    </div>
+    
+  
     <!--Slider from https://mdbootstrap.com/docs/b4/jquery/forms/slider/-->
     <div class="d-flex justify-content-between align-items-center my-4">
-      <label>Number of questions</label>
+      <strong>Number of questions</strong>
       <div class="w-50 d-flex justify-content-end">
         <input type="range" class="custom-range w-75" name="num_questions" id="customRange11" min="4" max="8">
         <span class="font-weight-bold text-light ml-2 valueSpan2"></span>
       </div>
     </div>
       
-    <%= submit_tag "Start quiz", class:"w-100 btn-outline-light" %>
+    <%= submit_tag "Start quiz", id: "start-btn", class:"w-100 btn-outline-light" %>
   <%end%>
   
   

@@ -9,7 +9,7 @@
       <h5><%= question.question%></h5><br/>
       
       <%question.answers.each do |answer|%>
-        <label class="category-select">
+        <label>
           <%= form.check_box "answers[#{question.id}]", {multiple: true}, answer.id, nil %>
           <%=answer.description%>
         </label></br>
