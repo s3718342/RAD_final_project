@@ -1,0 +1,21 @@
+<div class="elevated my-5 p-3">
+<%= form_with url: "/submit", method: :post do |form| %>
+  <%@questions.each do |question|%>
+    <div class="mb-4 border-bottom border-light">
+    <h5><%= question.question%></h5><br/>
+    
+    <%question.answers.each do |answer|%>
+      <label class="category-select">
+        <%= form.check_box "answers[#{question.id}]", {multiple: true}, answer.id, nil %>
+        <%=answer.description%>
+      </label></br>
+    <%end%>
+
+    </div>
+  <%end%>
+  
+  <%= hidden_field_tag "questions", value: @questions.ids %>
+  
+  <%= form.submit "Submit", class:"w-100 btn-outline-light" %>
+<%end%>
+</div>
