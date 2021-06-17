@@ -1,16 +1,50 @@
+require 'open-uri'
+require 'net/http'
+require 'json'
+
 class QuestionsController < ApplicationController
   
   before_action :checkValidity, only: [:submit, :result]
   before_action :getAnswersFromParams, only: [:submit]
   before_action :getQuestionsFromParams, only: [:submit, :result, :index]
+  
+  
   def index
     num_questions = 4
     if params[:num_questions]
       num_questions = params[:num_questions]
     end
     
-    if not @questions
-      @questions = Question.order(Arel.sql("RANDOM()")).limit(num_questions)
+    # Gets questions from the api using env variable api key
+    URI.open("http://quizapi.io/api/v1/questions?apiKey=#{ENV['QUIZ_API_KEY']}&limit=#{num_questions}") do |json|
+      data = JSON.parse(json.read)
+      # If there was no response, get random questions from db
+      if not data or data.empty?
+        @questions = Question.order(Arel.sql("RANDOM()")).limit(num_questions)
+      else
+        ids = []
+        # Iterate over the questions
+        data.each do |question|
+          id = question["id"].to_i
+          # Create a new question record if it does not exist in the db
+          if not Question.exists?(id: id)
+            q = Question.create!(
+              id: question["id"], 
+              question: question["question"], 
+              explanation: question["explanation"], 
+              category: question["category"], 
+              difficulty: question["difficulty"]
+            )
+            question["answers"].each do |key, value|
+              if(value)
+                q.answers.create!(description: value, correct: helpers.true?(question["correct_answers"]["#{key}_correct"]))
+              end
+            end
+          end
+          ids << id
+        end
+        @questions = Question.where(id: ids)
+      end
     end
   end
   
