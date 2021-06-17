@@ -36,7 +36,7 @@ class QuestionsController < ApplicationController
         cookies[:history] = JSON.generate([helpers.generateHistory(score, @questions.size)])
       else
         history = JSON.parse(cookies[:history])
-        history << helpers.generateHistory(score, @questions.size)
+        history.prepend(helpers.generateHistory(score, @questions.size))
         cookies[:history] = history.to_json
       end
       redirect_to action: "result", score: score, questions: params[:questions]
@@ -50,7 +50,11 @@ class QuestionsController < ApplicationController
   end
   
   def result
+    if cookies[:history].blank? or cookies[:history].size == 0
+      @history = []
+    else
     @history = JSON.parse(cookies[:history])
+    end
     @score = params[:score]
   end
   
