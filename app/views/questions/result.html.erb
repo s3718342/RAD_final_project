@@ -10,6 +10,9 @@
       <br/>
     <%end%>
   </div>
-  
-  <%= button_to "Take another quiz", url_options={controller: "pages", action: "home"},  method: :get, class: "mt-5 btn-outline-light w-100"%>
+  <div class="d-flex justify-content-around" role="group" aria-label="Basic example">
+    <%= button_to "Take another quiz", url_options={controller: "pages", action: "home"},  method: :get, class: "mt-5 btn btn-outline-light"%>
+    <%= link_to "Redo the quiz", quiz_path(questions: params[:questions]), method: :get, class: "mt-5 btn btn-outline-light"%>
+
+  </div>
 </div>
