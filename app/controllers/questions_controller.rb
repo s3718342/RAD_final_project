@@ -9,8 +9,6 @@ class QuestionsController < ApplicationController
   before_action :getQuestionsFromParams, only: [:submit, :result, :index]
   def index
     
-    puts params
-    
     if not params[:questions]
     
       num_questions = 4
@@ -45,15 +43,6 @@ class QuestionsController < ApplicationController
         else
           num = (prop/total * num_questions.to_f).round
         end
-        
-        puts "i"
-        puts "i"
-        puts "i"
-        puts "i"
-        puts "i"
-        puts "i"
-        puts "i"
-        print ids.length
         
         remaining -= num
         
@@ -153,7 +142,6 @@ class QuestionsController < ApplicationController
   end
   
   def getQuestionsFromParams
-    print params[:questions]
     if params[:questions]
       ids = eval(params[:questions])[:value]
       @questions = Question.where(id: ids)

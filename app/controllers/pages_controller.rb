@@ -1,7 +1,7 @@
 class PagesController < ApplicationController
   def home
     @chooseable_categories = ["Linux", "DevOps", "SQL", "Code"]
-    
+    # Load quiz options from cookies
     @categories = []
     if not (cookies[:categories].blank? or cookies[:categories].size == 0)
       @categories = JSON.parse(cookies[:categories])
